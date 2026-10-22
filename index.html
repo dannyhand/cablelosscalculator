@@ -202,6 +202,85 @@
       border-color: var(--accent);
     }
 
+    .field input:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      cursor: pointer;
+    }
+
+    .toggle input {
+      position: absolute;
+      opacity: 0;
+      width: 1px;
+      height: 1px;
+    }
+
+    .toggle .track {
+      flex: none;
+      width: 40px;
+      height: 22px;
+      border-radius: 11px;
+      background: var(--line);
+      position: relative;
+      transition: background 0.15s;
+    }
+
+    .toggle .track::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--panel);
+      transition: transform 0.15s;
+    }
+
+    .toggle input:checked+.track {
+      background: var(--accent);
+    }
+
+    .toggle input:checked+.track::after {
+      transform: translateX(18px);
+    }
+
+    .toggle input:focus-visible+.track {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .toggle .text {
+      min-width: 0;
+    }
+
+    .toggle .text b {
+      display: block;
+      font-weight: 500;
+    }
+
+    .toggle .text span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .toggle .track,
+      .toggle .track::after {
+        transition: none;
+      }
+    }
+
     .note {
       font-size: 12px;
       color: var(--muted);
@@ -301,6 +380,22 @@
     .formulas code+code {
       color: var(--muted);
     }
+
+    footer {
+      margin-top: 24px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    footer a {
+      color: var(--accent);
+      text-underline-offset: 3px;
+    }
+
+    footer a:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
   </style>
 
   <div class="wrap">
@@ -335,7 +430,13 @@
             <input id="mis" type="number" inputmode="decimal" step="any" min="0" value="0.18">
           </div>
         </div>
-        <p class="note">Tolerance of 1.0 means the datasheet value as printed. Use 1.05 to add 5% margin.</p>
+        <label class="toggle" for="ideal">
+          <input id="ideal" type="checkbox">
+          <span class="track" aria-hidden="true"></span>
+          <span class="text"><b>Ideal conditions</b><span>Sets Tolerance to 1.00 and Mismatch Loss to 0.00, and locks
+              both fields.</span></span>
+        </label>
+        <p class="note">Tolerance of 1.00 means the datasheet value as printed. The default of 1.05 adds 5% margin.</p>
       </section>
 
       <section class="panel readout" aria-labelledby="out-h" aria-live="polite">
@@ -368,6 +469,11 @@
       <code>Cable Loss = Tolerance × Loss per Foot × Length</code>
       <code>Total Calculated Loss = Cable Loss + Total Connector Loss + Mismatch Loss</code>
     </div>
+
+    <footer>
+      <a href="https://dannyhand.us" target="_blank" rel="noopener">dannyhand.us</a> - <a
+        href="https://github.com/dannyhand/cablelosscalculator" target="_blank" rel="noopener">View on GitHub</a>
+    </footer>
   </div>
 
   <script>
@@ -398,9 +504,24 @@
   }
 
   ids.forEach(function (id) { el[id].addEventListener("input", update); });
+
+  var ideal = document.getElementById("ideal");
+  ideal.addEventListener("change", function () {
+    if (ideal.checked) {
+      el.tol.value = "1.00";
+      el.mis.value = "0.00";
+    } else {
+      el.tol.value = "1.05";
+      el.mis.value = "0.18";
+    }
+    el.tol.disabled = ideal.checked;
+    el.mis.disabled = ideal.checked;
+    update();
+  });
+
   update();
 })();
-</script>
+  </script>
 
 </body>
 
