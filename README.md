@@ -1,5 +1,5 @@
 # Cable Loss Calculator
-Web-based calculator for coaxial cable loss. Made for electricians by an electrician.
+Web-based calculator for coaxial cable loss.
 
 HTML, Javascript, CSS
 
