@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cable Prep Dimensions</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #1b2430;
+      --muted: #5f6b7a;
+      --line: #d9dee5;
+      --accent: #0a6ebd;
+      --accent-soft: #e3f0fb;
+      --group: #e9edf2;
+      --jacket: #2b2f36;
+      --shield: #c77b30;
+      --diel: #e8e2cf;
+      --center: #d29b4a;
+      --cut: #d23c3c;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #11161c;
+        --card: #1a2129;
+        --text: #e6ebf1;
+        --muted: #9aa6b4;
+        --line: #2c3540;
+        --accent: #4fa8f0;
+        --accent-soft: #1c3247;
+        --group: #222b35;
+        --jacket: #5b6370;
+        --shield: #d88a3c;
+        --diel: #cfc7ad;
+        --center: #e0a85a;
+        --cut: #ff6b6b;
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #11161c;
+      --card: #1a2129;
+      --text: #e6ebf1;
+      --muted: #9aa6b4;
+      --line: #2c3540;
+      --accent: #4fa8f0;
+      --accent-soft: #1c3247;
+      --group: #222b35;
+      --jacket: #5b6370;
+      --shield: #d88a3c;
+      --diel: #cfc7ad;
+      --center: #e0a85a;
+      --cut: #ff6b6b;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin-top: 12px
+    }
+
+    .legend {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: .8rem;
+      color: var(--muted);
+      margin-top: 6px
+    }
+
+    .legend i {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      vertical-align: -2px;
+      margin-right: 4px
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif
+    }
+
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      margin: 4px 0 2px
+    }
+
+    .sub {
+      color: var(--muted);
+      margin: 0 0 14px;
+      font-size: .9rem
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px
+    }
+
+    .controls input {
+      flex: 1 1 220px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--card);
+      color: var(--text);
+      font-size: 1rem
+    }
+
+    #detail {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 14px;
+      display: none
+    }
+
+    #detail.show {
+      display: block
+    }
+
+    #detail h2 {
+      margin: 0 0 2px;
+      font-size: 1.2rem
+    }
+
+    #detail .tool {
+      color: var(--muted);
+      margin-bottom: 10px
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px
+    }
+
+    .stat {
+      background: var(--accent-soft);
+      border-radius: 8px;
+      padding: 8px
+    }
+
+    .stat .k {
+      font-size: .75rem;
+      color: var(--muted)
+    }
+
+    .stat .v {
+      font-size: 1.25rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px
+    }
+
+    thead th {
+      box-shadow: 0 1px 0 var(--line)
+    }
+
+    thead th:first-child {
+      border-top-left-radius: 10px
+    }
+
+    thead th:last-child {
+      border-top-right-radius: 10px
+    }
+
+    th,
+    td {
+      padding: 9px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--line)
+    }
+
+    th {
+      font-size: .78rem;
+      color: var(--muted);
+      font-weight: 600;
+      background: var(--card);
+      position: sticky;
+      top: 0;
+      z-index: 1
+    }
+
+    td.num,
+    th.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap
+    }
+
+    tr.group td {
+      background: var(--group);
+      font-weight: 600;
+      font-size: .85rem;
+      color: var(--muted)
+    }
+
+    tr.row {
+      cursor: pointer
+    }
+
+    tr.row:hover td {
+      background: var(--accent-soft)
+    }
+
+    tr.row.sel td {
+      background: var(--accent-soft);
+      box-shadow: inset 3px 0 0 var(--accent)
+    }
+
+    td.cable {
+      font-weight: 600;
+      white-space: nowrap
+    }
+
+    td.tool {
+      color: var(--muted);
+      font-size: .88rem
+    }
+
+    .tool-m {
+      display: none;
+      font-weight: 400;
+      font-size: .78rem;
+      color: var(--muted);
+      white-space: normal;
+      margin-top: 2px
+    }
+
+    .empty {
+      padding: 20px;
+      text-align: center;
+      color: var(--muted)
+    }
+
+    footer {
+      margin-top: 20px;
+      padding: 12px 0;
+      text-align: center;
+      font-size: .85rem;
+      color: var(--muted)
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none
+    }
+
+    footer a:hover {
+      text-decoration: underline
+    }
+
+    @media (max-width:700px) {
+      .wide {
+        display: none
+      }
+
+      .tool-m {
+        display: block
+      }
+
+      td.cable {
+        white-space: normal
+      }
+
+      th,
+      td {
+        padding: 8px 6px
+      }
+
+      .stat .v {
+        font-size: 1.05rem
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>Cable Prep Dimensions</h1>
+    <p class="sub">Strip lengths and prep tools for coax &amp; Heliax. Tap a cable for full details.</p>
+
+    <div class="controls">
+      <input id="q" type="search" placeholder="Search cable or tool (e.g. LDF4, MCPT-78)" autocomplete="off">
+    </div>
+
+    <div id="detail"></div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Cable</th>
+          <th class="wide">Prep Tool</th>
+          <th class="num">Remove<br>Jacket</th>
+          <th class="num">Remove<br>Shield</th>
+          <th class="num">Shield<br>Left</th>
+          <th class="num">Cond.<br>Left</th>
+          <th class="num wide">Ridges<br>Jkt Rem / Shld Rem.</th>
+        </tr>
+      </thead>
+      <tbody id="tb"></tbody>
+    </table>
+    <footer>
+      <a href="https://dannyhand.us" target="_blank" rel="noopener">dannyhand.us</a> - <a
+        href="https://github.com/dannyhand/cablelosscalculator" target="_blank" rel="noopener">View on GitHub</a>
+    </footer>
+  </div>
+
+  <script>
+// ---------------------------------------------------------------------------
+// CABLE DATA
+// Each cable row is an array of 8 text values, in this order:
+// [cable, prep tool, jacket removed, insulation removed, shield remaining,
+//  inner conductor remaining, jacket ridges removed, shield ridges remain]
+// Lengths are in mm. A range is written "low-high". "" means no value.
+// ---------------------------------------------------------------------------
+const GROUPS = [                                   // List of cable families, shown in this order
+  { name: "LDF Heliax", cables: [                  // LDF group heading and its cables
+    ["LDF1-50 PosiLock", "CPT-L1 DRILL",             "25.0", "6.0",  "19.0", "6.0", "7", "5"],  // LDF1-50 PosiLock row
+    ["LDF2-50 PosiLock", "CPT-E2L2N DRILL",          "28.0", "6.0",  "22.0", "6.0", "",  ""],  // LDF2-50 PosiLock row
+    ["LDF4-50 D", "CPT-L4-D DRILL",       "46.0", "15.5", "30.5", "15.5", "9", "6"],  // LDF4-50 D row
+    ["LDF4-50 H", "MCPT-L4", "51.0", "20.0", "31.0", "5.0", "10", "6"],  // LDF4-50 H row (self-flare, solder pin)
+    ["LDF4-50 PosiStop", "MCPT-L4, CPT-12U DRILL",   "50.0", "17.0", "33.0", "7.0", "9", "6"],  // LDF4-50 PosiStop row
+    ["LDF5-50 PosiStop", "MCPT-78, CPT-78U DRILL",                         "50.0", "12.0", "38.0", "0",   "",  ""],  // LDF5-50 PosiStop row
+  ]},                                              // End of LDF group
+  { name: "AVA Virtual Air", cables: [             // AVA group heading and its cables
+    ["AVA5-50 EZfit",    "78-HPT, A5-EZPT DRILL",                "16.0", "8.0",  "8.0",  "8.0", "2", "1"],   // AVA5-50 EZfit row
+    ["AVA5-50 PosiStop", "MCPT-78, CPT-78U DRILL",               "25.0", "0",    "25.0", "0", "4", "4"],  // AVA5-50 PosiStop row
+    ["AVA6-50 EZfit",    "A6-EZPT DRILL",                        "16.0", "8.0",  "8.0",  "8.0", "", ""],   // AVA6-50 EZfit row
+    ["AVA6-50 PosiStop", "CPT-114U DRILL", "29.0", "0",    "29.0", "0", "", ""],   // AVA6-50 row
+    ["AVA7-50 EZfit",    "A7-EZPT DRILL",                        "16.0", "8.0",  "8.0",  "8.0", "", ""],   // AVA7-50 EZfit row
+    ["AVA7-50 PosiStop", "CPT-158U DRILL",                "45.0", "0",    "45.0", "0", "", ""],   // AVA7-50 row
+  ]},                                              // End of AVA group
+  { name: "FSJ Superflexible", cables: [           // FSJ group heading and its cables
+    ["FSJ1-50 HC",  "MCPT-1412", "33.7", "12.7", "21.0", "6.5", "", ""],   // FSJ1-50 HC row
+    ["FSJ2-50 PosiLock",  "MCPT-3812", "31.7", "12.7", "19.0", "6.0", "", ""],   // FSJ2-50 PosiLock row
+    ["FSJ4-50 C",   "N/A", "33.0", "18.0", "15.0", "5.0", "11", "5"],   // FSJ4-50 C row
+    ["FSJ4-50 HC",  "MCPT-1412, CPT-F4B DRILL","28.0", "7.0",  "21.0", "7.0", "9", "7"],   // FSJ4-50 HC row
+  ]},                                              // End of FSJ group
+  { name: "RFS LCF CELLFLEX", cables: [                     // LCF group heading and its cables
+    ["LCF12-50",  "RFS TRIM-LCF12-D01",    "30.5",      "6.5",       "24.0", "6.5", "", ""],   // LCF12-50 row
+    ["LCF78-50",  "RFS TRIM-SET-L78-D01",  "32.0",      "0",         "32.0", "0",   "", ""],   // LCF78-50 row
+    ["LCF158-50", "RFS TRIM-SET-L158-D01", "38.0",      "0",         "38.0", "0",   "", ""],   // LCF158-50 row
+  ]},                                              // End of LCF group
+  { name: "LMR Times Coax", cables: [                         // LMR group heading and its cables
+    ["LMR400 EZ", "CST-400", "23.0", "6.5", "16.5", "6.5", "", ""],     // LMR400 EZ row
+    ["LMR600 EZ", "CST-600", "25.4", "6.35", "19.05", "6.35", "", ""],  // LMR600 EZ row
+    ["LMR600 TC NMH", "CST-600", "31.75", "6.35", "25.4", "6.35", "", ""], // LMR600 TC NMH row
+    ["LMR900 EZ", "ST-900C", "10.3", "0", "10.3", "0", "", ""],            // LMR900 EZ row
+  ]},                                              // End of LMR group
+];                                                 // End of cable data
+
+// Approximate ridge length (distance from one ridge to the next), mm.
+// Values measured on real cable (averages).
+const RIDGE_LENGTH = {                            // Cable name -> approx. ridge length in mm
+  "AVA5-50 PosiStop": "6.8",                       // Measured on real cable (average)
+  "AVA5-50 EZfit":    "6.8",                       // Measured on real cable (average)
+  "LDF4-50 D": "5.14",                             // Measured on real cable (average)
+  "LDF4-50 PosiStop": "5.14",                      // Measured on real cable (average)
+  "LDF4-50 H": "5.14",                              // Same cable, measured on real cable (average)
+  "FSJ4-50 HC": "3.0",                              // Measured on real cable
+  "FSJ4-50 C":  "3.0",                              // Measured on real cable
+  "LDF1-50 PosiLock": "3.78",                      // Measured on real cable
+};                                                 // End of ridge length
+
+// ---------------------------------------------------------------------------
+// PAGE STATE
+// ---------------------------------------------------------------------------
+let selected = "LDF4-50 PosiStop";                 // Name of the selected cable (LDF4-50 PosiStop on page load), or null if none
+
+// ---------------------------------------------------------------------------
+// FORMATTING HELPERS
+// ---------------------------------------------------------------------------
+function len(s) {                                  // Format a length string for display
+  if (s === "") return "—";                        // Blank value shows as a dash
+  return s.replace("-", "–");                      // Show as-is; a range like "50.0-60.0" gets a proper en dash
+}                                                  // End of len()
+const withUnit = s => s === "" ? "—" : len(s) + " mm"; // Same as len() but adds " mm" after the number
+const ridges = (j, s) => (j === "" && s === "") ? "—" : `${j || "—"} / ${s || "—"}`; // Show ridge counts as "jacket / shield", or a dash if both blank
+
+// ---------------------------------------------------------------------------
+// TABLE
+// ---------------------------------------------------------------------------
+function render() {                                // Rebuild the whole table (called on search or tap)
+  const q = document.getElementById("q").value.trim().toLowerCase(); // Read the search box text, trimmed and lowercase
+  let html = "", count = 0;                        // html collects table rows; count tracks how many cables matched
+  for (const g of GROUPS) {                        // Go through each cable family
+    const rows = g.cables.filter(c => !q ||        // Keep every cable if the search is empty, otherwise...
+      c[0].toLowerCase().includes(q) || c[1].toLowerCase().includes(q)); // ...keep it if the cable name or tool contains the search text
+    if (!rows.length) continue;                    // Skip the whole group if nothing in it matched
+    html += `<tr class="group"><td colspan="7">${g.name}</td></tr>`; // Add the gray group heading row
+    for (const c of rows) {                        // Go through each matching cable in this group
+      count++;                                     // Count it as a match
+      // Add one table row: highlighted if it's the selected cable, tool shown under the name on phones,
+      // then jacket, insulation, shield, conductor remaining, and ridge counts (ridges hidden on phones)
+      html += `<tr class="row${selected === c[0] ? " sel" : ""}" data-c="${c[0]}">
+        <td class="cable">${c[0]}<div class="tool-m">${c[1]}</div></td>
+        <td class="tool wide">${c[1]}</td>
+        <td class="num">${len(c[2])}</td>
+        <td class="num">${len(c[3])}</td>
+        <td class="num">${len(c[4])}</td>
+        <td class="num">${len(c[5])}</td>
+        <td class="num wide">${ridges(c[6], c[7])}</td></tr>`;
+    }                                              // End of cables in this group
+  }                                                // End of groups
+  document.getElementById("tb").innerHTML =        // Put the built rows into the table body...
+    count ? html : `<tr><td colspan="7" class="empty">No matching cables</td></tr>`; // ...or a "no matches" row if nothing matched
+  renderDetail();                                  // Refresh the detail card above the table
+}                                                  // End of render()
+
+function find(name) {                              // Look up a cable's data row by its name
+  for (const g of GROUPS) for (const c of g.cables) if (c[0] === name) return c; // Search every group; return the first name match
+  return null;                                     // Not found
+}                                                  // End of find()
+
+// ---------------------------------------------------------------------------
+// DETAIL CARD (shown when a cable is tapped)
+// ---------------------------------------------------------------------------
+function renderDetail() {                          // Draw or hide the detail card for the selected cable
+  const d = document.getElementById("detail");     // The detail card element
+  const c = selected && find(selected);            // Data for the selected cable, if one is selected
+  if (!c) { d.className = ""; d.innerHTML = ""; return; } // Nothing selected: hide and empty the card
+  const [name, tool, jk, ins, sh, cc, jr, sr] = c; // Unpack the 8 values into named variables
+  d.className = "show";                            // Make the card visible
+  // Fill the card: cable name, prep tool, seven value boxes (ridge length looked up by name), then the strip diagram
+  d.innerHTML = `
+    <h2>${name}</h2>
+    <div class="tool">Prep tool: ${tool}</div>
+    <div class="stats">
+      <div class="stat"><div class="k">Remove jacket</div><div class="v">${withUnit(jk)}</div></div>
+      <div class="stat"><div class="k">Remove shield</div><div class="v">${withUnit(ins)}</div></div>
+      <div class="stat"><div class="k">Shield left</div><div class="v">${withUnit(sh)}</div></div>
+      <div class="stat"><div class="k">Inner conductor left</div><div class="v">${withUnit(cc)}</div></div>
+      <div class="stat"><div class="k">Jacket ridges removed</div><div class="v">${jr || "—"}</div></div>
+      <div class="stat"><div class="k">Shield ridges remain</div><div class="v">${sr || "—"}</div></div>
+      <div class="stat"><div class="k">Ridge length (approx.)</div><div class="v">${RIDGE_LENGTH[name] ? "~" + RIDGE_LENGTH[name] + " mm" : "—"}</div></div>
+    </div>
+    ${diagram(c)}`;
+}                                                  // End of renderDetail()
+
+// ---------------------------------------------------------------------------
+// STRIP DIAGRAM
+// ---------------------------------------------------------------------------
+const mid = s => {                                 // Turn a length string into one number in mm for drawing
+  if (s === "") return 0;                          // Blank counts as 0
+  const p = s.split("-").map(Number);              // Split a range into numbers (a single value gives one number)
+  return p.reduce((a, b) => a + b, 0) / p.length;  // Average them, so a range is drawn at its midpoint
+};                                                 // End of mid()
+
+function diagram(c) {                              // Build the SVG strip diagram for one cable
+  const [name, , jk, ins, sh, cc] = c;             // Pull out name, jacket, insulation, shield, conductor remaining (tool skipped)
+  const S = mid(sh);                               // Shield + insulation section length, mm
+  const I = mid(ins);                              // Strip-away section length, mm
+  const C = Math.min(mid(cc), I);                  // Conductor remaining, capped so the cut stays inside the strip-away section
+  const total = S + I;                             // Total stripped length to draw
+  if (!total) return "";                           // Nothing to draw if there's no length
+  const W = 600;                                   // Drawing width in SVG units
+  const x0 = 20;                                   // Left margin
+  const LENGTH = 65;                               // Total drawn cable length in mm, jacket included
+  const scale = (W - x0 - 20) / Math.max(LENGTH, total); // SVG units per mm, the same for every cable (65 mm fills the width)
+  const MAX_JACKET = 26;                           // Longest the drawn jacket can be, in mm
+  const jacketMm = Math.min(Math.max(LENGTH - total, 0), MAX_JACKET); // Jacket fills the rest of the 65 mm, up to 26 mm
+  const intact = jacketMm * scale;                 // Jacket section width; short strips leave empty space on the right
+  const xs = x0 + intact;                          // x where the jacket ends (start of shield section)
+  const xi = xs + S * scale;                       // x where the shield section ends (start of strip-away section)
+  const xe = xi + I * scale;                       // x of the cable end
+  const xc = xi + C * scale;                       // x of the cut line
+  const U = " mm";                                 // Unit label added after numbers
+
+  // dim(): draws a dimension line from x=a to x=b at height y, with arrowheads, end ticks, and a label.
+  // Label goes above the line, or below it when "below" is true. Returns nothing if the span is too short.
+  const dim = (a, b, y, label, below) => b - a < 1 ? "" : `
+    <line x1="${a}" y1="${y}" x2="${b}" y2="${y}" stroke="currentColor" marker-start="url(#ar)" marker-end="url(#ar)"/>
+    <line x1="${a}" y1="${y-6}" x2="${a}" y2="${y+6}" stroke="currentColor"/>
+    <line x1="${b}" y1="${y-6}" x2="${b}" y2="${y+6}" stroke="currentColor"/>
+    <text x="${Math.min((a+b)/2, W - 75)}" y="${below ? y + 20 : y - 6}" text-anchor="middle" font-size="13" fill="currentColor">${label}</text>`;
+
+  // Cut marker (only if there's a strip-away section): red vertical line,
+  // conductor-remaining value to its left, and the word "Cut" centered above it
+  const cut = I > 0 ? `
+    <line x1="${xc}" y1="56" x2="${xc}" y2="122" stroke="var(--cut)" stroke-width="2"/>
+    <text x="${xc - 6}" y="66" text-anchor="end" font-size="12" fill="currentColor">${len(cc)}${U}</text>
+    <text x="${Math.min(xc, W - 14)}" y="50" text-anchor="middle" font-size="12" font-weight="600" fill="var(--cut)">Cut</text>` : "";
+
+  // Assemble the SVG, top to bottom: arrowhead definition, jacket dimension,
+  // intact jacket, exposed shield, dielectric face, conductor (solid up to the cut, faded after),
+  // cut marker, then the Shield Left, Inner Conductor, and Strip Away dimensions; legend below
+  return `
+    <svg viewBox="0 0 ${W} 226" style="color:var(--text)" role="img" aria-label="Strip diagram for ${name}">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+      ${dim(xs, xe, 26, `Remove Jacket ${len(jk)}${U}`)}
+      <rect x="${x0}" y="78" width="${intact}" height="40" rx="4" fill="var(--jacket)"/>
+      ${S > 0 ? `<rect x="${xs}" y="81" width="${xi - xs}" height="34" fill="var(--shield)"/>` : ""}
+      ${I > 0 ? `
+        <rect x="${xi - 3}" y="84" width="3" height="28" fill="var(--diel)"/>
+        <rect x="${xi}" y="92" width="${xc - xi}" height="12" fill="var(--center)"/>
+        <rect x="${xc}" y="92" width="${xe - xc}" height="12" fill="var(--center)" opacity=".3"/>` : ""}
+      ${cut}
+      ${dim(xs, xi, 150, `Shield Left ${len(sh)}${U}`)}
+      ${dim(xi, xc, 150, `Inner Conductor ${len(cc)}${U}`, true)}
+      ${dim(xi, xe, 196, `Strip Away ${len(ins)}${U}`, true)}
+    </svg>
+    <div class="legend">
+      <span><i style="background:var(--jacket)"></i>Jacket</span>
+      <span><i style="background:var(--shield)"></i>Shield</span>
+      <span><i style="background:var(--center)"></i>Inner Conductor</span>
+      <span><i style="background:var(--cut)"></i>Cut line</span>
+    </div>`;
+}                                                  // End of diagram()
+
+// ---------------------------------------------------------------------------
+// EVENT HANDLERS
+// ---------------------------------------------------------------------------
+document.getElementById("q").addEventListener("input", render); // Re-filter the table on every keystroke in the search box
+
+document.getElementById("tb").addEventListener("click", e => {  // Handle taps anywhere in the table body
+  const tr = e.target.closest("tr.row");           // Find the cable row that was tapped (ignores group headings)
+  if (!tr) return;                                 // Tap wasn't on a cable row; do nothing
+  selected = selected === tr.dataset.c ? null : tr.dataset.c; // Tap a new cable to select it, tap the same one again to deselect
+  render();                                        // Redraw the table highlight and detail card
+  if (selected) document.getElementById("detail").scrollIntoView({behavior:"smooth", block:"nearest"}); // Scroll the detail card into view
+});                                                // End of table tap handler
+
+render();                                          // Draw the table for the first time when the page loads
+</script>
+</body>
+
+</html>
