@@ -5,15 +5,15 @@ HTML, Javascript, CSS
 
 ### loss.html is the coaxial loss calculator.
 
-See the loss calculator work at https://dannyhand.us/loss/
+Try out the coaxial cable loss calculator at https://dannyhand.us/loss/
 
 
 ### vp.html is a table of Vp values for coaxial cables, with a cut length calculator.
 
-See Vp table at https://dannyhand.us/vp/
+See the Vp table at https://dannyhand.us/vp/
 
 
 ### connectors.html is a table of measurements for Heliax connector prep, with a beautiful diagram.
 
-See connector prep at https://dannyhand.us/connectors/
+See the connector preparation guide at https://dannyhand.us/connectors/
 
