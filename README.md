@@ -17,3 +17,9 @@ See the Vp table at https://dannyhand.us/vp/
 
 See the connector preparation guide at https://dannyhand.us/connectors/
 
+### Build for Android
+Do: `GitHub > Actions > Build Android APK`
+
+ - Uses Capacitor to produce apk.
+ - Pre-built apk is available in Releases.
+   
