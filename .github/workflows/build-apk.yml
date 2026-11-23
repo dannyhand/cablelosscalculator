@@ -1,0 +1,196 @@
+# .github/workflows/build-apk.yml  (Capacitor: web files bundled inside the APK)
+# The app opens to loss.html, and each page gets a menu button (top right)
+# to switch between loss.html, vp.html and connectors.html.
+name: Build Android APK
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Read version
+        run: |
+          echo "VERSION=$(jq -r .versionName version.json)" >> "$GITHUB_ENV"
+          echo "CODE=$(jq -r .versionCode version.json)" >> "$GITHUB_ENV"
+
+      - name: Prepare web files
+        run: |
+          mkdir -p cap-build/www
+          rsync -a \
+            --exclude '.*' --exclude 'android' --exclude 'cap-build' --exclude 'app' \
+            --exclude 'node_modules' --exclude 'version.json' \
+            --exclude 'README.md' --exclude 'LICENSE' \
+            ./ cap-build/www/
+          cp app/page-menu.js cap-build/www/
+
+      # App-only changes (the website is unchanged):
+      #  - index.html sends the app straight to loss.html
+      #  - each page loads page-menu.js (the top-right page switcher)
+      #  - Google Fonts are downloaded into the app so it works offline
+      - name: Add start page, page menu and bundled fonts
+        working-directory: cap-build/www
+        run: |
+          python3 - <<'EOF'
+          import os, re, urllib.request
+          UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                              "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"}
+          def get(u):
+              return urllib.request.urlopen(urllib.request.Request(u, headers=UA)).read()
+
+          open("index.html", "w").write(
+              '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=loss.html">'
+              '<script>location.replace("loss.html")</script>')
+
+          os.makedirs("fonts", exist_ok=True)
+          saved = {}
+          link_re = re.compile(r'<link[^>]*?href="(https://fonts\.googleapis\.com/[^"]+)"[^>]*>', re.S)
+          for page in ("loss.html", "vp.html", "connectors.html"):
+              html = open(page, encoding="utf-8").read()
+              stem = page[:-5]
+              def local_css(m):
+                  css = get(m.group(1).replace("&amp;", "&")).decode()
+                  def dl(u):
+                      url = u.group(1)
+                      if url not in saved:
+                          saved[url] = f"fonts/f{len(saved) + 1}.woff2"
+                          open(saved[url], "wb").write(get(url))
+                      return "url(" + saved[url] + ")"
+                  open(f"fonts-{stem}.css", "w").write(re.sub(r"url\((https://[^)]+)\)", dl, css))
+                  return f'<link rel="stylesheet" href="fonts-{stem}.css">'
+              html = link_re.sub(local_css, html)
+              html = re.sub(r'<link[^>]+fonts\.gstatic\.com[^>]*>', "", html)
+              tag = '<script src="page-menu.js"></script>'
+              html = html.replace("</body>", tag + "\n</body>", 1) if "</body>" in html else html + tag
+              open(page, "w", encoding="utf-8").write(html)
+          print(f"Pages updated; bundled {len(saved)} font files")
+          EOF
+
+      - name: Create Capacitor project
+        working-directory: cap-build
+        run: |
+          npm init -y > /dev/null
+          npm i @capacitor/core@^8 @capacitor/android@^8 @capacitor/app@^8
+          npm i -D @capacitor/cli@^8
+          npx cap init "Cable Loss Calculator" "us.dannyhand.cablelosscalculator" --web-dir www
+          npx cap add android
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Writes every launcher icon Android uses (legacy + adaptive) straight
+      # from icons/icon-512.png,
+      # replacing all of Capacitor's default icons.
+      - name: Generate app icons
+        working-directory: cap-build/android/app/src/main/res
+        run: |
+          pip install --quiet pillow
+          python3 - <<'EOF'
+          import os
+          from PIL import Image
+
+          src = Image.open("../../../../../www/icons/icon-512.png").convert("RGBA")
+
+          # Adaptive-icon background colour = the icon's top-left pixel
+          # (white if that corner is transparent).
+          r, g, b, a = src.getpixel((0, 0))
+          bg = "#{:02X}{:02X}{:02X}".format(r, g, b) if a > 0 else "#FFFFFF"
+
+          sizes = {"mdpi": 1, "hdpi": 1.5, "xhdpi": 2, "xxhdpi": 3, "xxxhdpi": 4}
+          for dpi, s in sizes.items():
+              d = f"mipmap-{dpi}"
+              os.makedirs(d, exist_ok=True)
+              # Legacy icons (Android 7 and older launchers)
+              legacy = src.resize((int(48 * s),) * 2, Image.LANCZOS)
+              legacy.save(f"{d}/ic_launcher.png")
+              legacy.save(f"{d}/ic_launcher_round.png")
+              # Adaptive foreground: 108dp canvas, icon fills the 72dp visible area
+              canvas = int(108 * s)
+              inner = int(72 * s)
+              fg = Image.new("RGBA", (canvas, canvas), (0, 0, 0, 0))
+              icon = src.resize((inner, inner), Image.LANCZOS)
+              off = (canvas - inner) // 2
+              fg.paste(icon, (off, off), icon)
+              fg.save(f"{d}/ic_launcher_foreground.png")
+
+          adaptive = """<?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+              <background android:drawable="@color/ic_launcher_background"/>
+              <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
+          </adaptive-icon>
+          """
+          os.makedirs("mipmap-anydpi-v26", exist_ok=True)
+          for name in ("ic_launcher.xml", "ic_launcher_round.xml"):
+              with open(f"mipmap-anydpi-v26/{name}", "w") as f:
+                  f.write(adaptive)
+
+          os.makedirs("values", exist_ok=True)
+          with open("values/ic_launcher_background.xml", "w") as f:
+              f.write('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n'
+                      f'    <color name="ic_launcher_background">{bg}</color>\n</resources>\n')
+
+          # Replace Capacitor's default splash images with the icon centred on bg
+          for root, _, files in os.walk("."):
+              for fn in files:
+                  if fn == "splash.png":
+                      p = os.path.join(root, fn)
+                      w, h = Image.open(p).size
+                      splash = Image.new("RGBA", (w, h), bg)
+                      size = min(w, h) // 3
+                      ic = src.resize((size, size), Image.LANCZOS)
+                      splash.paste(ic, ((w - size) // 2, (h - size) // 2), ic)
+                      splash.save(p)
+          print("Icons written, background", bg)
+          EOF
+
+      - name: Set version
+        working-directory: cap-build/android/app
+        run: |
+          sed -i "s/versionCode [0-9]*/versionCode $CODE/" build.gradle
+          sed -i "s/versionName \"[^\"]*\"/versionName \"$VERSION\"/" build.gradle
+          grep -E 'versionCode|versionName' build.gradle
+
+      - name: Build unsigned APK and AAB
+        working-directory: cap-build/android
+        run: ./gradlew assembleRelease bundleRelease --no-daemon
+
+      - name: Sign
+        working-directory: cap-build/android/app/build/outputs
+        env:
+          KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASS: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/android.keystore"
+          KS="$RUNNER_TEMP/android.keystore"
+          BT="$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)"
+          mkdir -p "$GITHUB_WORKSPACE/out"
+
+          "$BT/zipalign" -p -f 4 apk/release/app-release-unsigned.apk "$RUNNER_TEMP/aligned.apk"
+          "$BT/apksigner" sign --ks "$KS" --ks-key-alias android \
+            --ks-pass env:KS_PASS --key-pass env:KEY_PASS \
+            --v4-signing-enabled false \
+            --out "$GITHUB_WORKSPACE/out/cablelosscalculator-v$VERSION.apk" "$RUNNER_TEMP/aligned.apk"
+
+          cp bundle/release/app-release.aab "$GITHUB_WORKSPACE/out/cablelosscalculator-v$VERSION.aab"
+          jarsigner -keystore "$KS" -storepass "$KS_PASS" -keypass "$KEY_PASS" \
+            "$GITHUB_WORKSPACE/out/cablelosscalculator-v$VERSION.aab" android
+
+          rm -f "$KS"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cablelosscalculator-v${{ env.VERSION }}-android
+          path: out/
+          
