@@ -14,7 +14,7 @@
     width:42px;height:42px;border-radius:10px;border:1px solid var(--pm-line);background:var(--pm-bg);
     color:var(--pm-fg);display:flex;align-items:center;justify-content:center;cursor:pointer;
     box-shadow:0 1px 3px rgba(0,0,0,.15);-webkit-tap-highlight-color:transparent;padding:0}
-  #pm-btn svg{width:22px;height:22px}
+  #pm-btn svg{width:22px;height:22px;margin:0;display:block;flex:none}
   #pm-menu{position:absolute;top:calc(env(safe-area-inset-top,0px) + 58px);right:10px;z-index:1001;
     min-width:220px;background:var(--pm-bg);color:var(--pm-fg);border:1px solid var(--pm-line);
     border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.22);padding:6px;
